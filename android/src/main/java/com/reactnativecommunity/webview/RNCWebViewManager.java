@@ -26,6 +26,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.HttpAuthHandler;
@@ -921,6 +922,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     public void onPageFinished(WebView webView, String url) {
       super.onPageFinished(webView, url);
 
+      String cookies = CookieManager.getInstance().getCookie(url);
+      if (cookies != null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().flush();
+        } else {
+            CookieSyncManager.getInstance().sync();
+        }
+      }
+      
       if (!mLastLoadFailed) {
         RNCWebView reactWebView = (RNCWebView) webView;
 
